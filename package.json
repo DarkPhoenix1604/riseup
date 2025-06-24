@@ -4,8 +4,7 @@
     "private": true,
     "scripts": {
       "dev": "npm run dev --prefix RiseUp",
-      "build": "npm install --prefix Backend && npm install --prefix RiseUp && npm run build --prefix RiseUp",
-      "start": "npm run start --prefix Backend"
+      "build": "npm install --prefix Backend && npm install --prefix RiseUp && npm run build --prefix RiseUp"
     },
     "repository": {
       "type": "git",
