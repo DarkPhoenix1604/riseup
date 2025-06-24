@@ -1,0 +1,21 @@
+{
+    "name": "riseup-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "npm install --prefix Backend && npm install --prefix RiseUp && npm run build --prefix RiseUp",
+        "start": "npm run start --prefix Backend"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DarkPhoenix1604/riseup.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/DarkPhoenix1604/riseup/issues"
+    },
+    "homepage": "https://github.com/DarkPhoenix1604/riseup#readme",
+    "description": ""
+}
