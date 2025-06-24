@@ -1,0 +1,638 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rise Up - Job Recommendation</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #da0000;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #da0000;
+            --danger: #da0000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color:white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: var(--danger);
+            color:white (212, 36, 36);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .header p {
+            opacity: 0.8;
+            font-size: 16px;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5eb;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px #da0000;
+        }
+        
+        select.input-field {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 40px;
+            appearance: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--accent), red);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 195, 161, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .job-results {
+            padding: 25px;
+            border-top: 1px solid #e1e5eb;
+            display: none;
+        }
+        
+        .job-results.visible {
+            display: block;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .job-card {
+            background-color: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .job-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .job-card p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .job-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .job-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background-color: red;
+            color: var(--secondary);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .job-link:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .error-message {
+            background-color: #ffeaea;
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message.visible {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .loader {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .skill-badge {
+            background-color: var(--accent);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .location-option {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .location-option label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f2d74e;
+            opacity: 0;
+        }
+
+        @media (max-width: 600px) {
+            .form-container, .job-results {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Rise Up - Job Recommendation</h1>
+            <p>Find the perfect opportunity based on your skills</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="error-message" id="errorMessage">
+                Please enter your name and select a skill
+            </div>
+            
+            <div class="input-group">
+                <label for="userName">Your Name</label>
+                <input type="text" id="userName" class="input-field" placeholder="Enter your full name">
+            </div>
+            
+            <div class="input-group">
+                <label for="userSkills">Your Primary Skill</label>
+                <select id="userSkills" class="input-field">
+                    <option value="">-- Select your skill --</option>
+                    <option value="sewing">Sewing</option>
+                    <option value="iti diploma">ITI Diploma</option>
+                    <option value="dancing">Dancing</option>
+                    <option value="singing">Singing</option>
+                    <option value="pottery">Pottery</option>
+                    <option value="farming">Farming</option>
+                    <option value="fishing">Fishing</option>
+                    <option value="carpentry">Carpentry</option>
+                    <option value="tailoring">Tailoring</option>
+                    <option value="welding">Welding</option>
+                    <option value="baking">Baking</option>
+                    <option value="handicrafts">Handicrafts</option>
+                    <option value="plumbing">Plumbing</option>
+                    <option value="electrician">Electrician</option>
+                    <option value="beautician">Beautician</option>
+                    <option value="mechanic">Mechanic</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>Preferred Location</label>
+                <div class="location-option">
+                    <label><input type="radio" name="location" value="local" checked> Local</label>
+                    <label><input type="radio" name="location" value="remote"> Remote</label>
+                    <label><input type="radio" name="location" value="anywhere"> Anywhere</label>
+                </div>
+            </div>
+            
+            <button id="recommendBtn" class="btn">Get Recommendations</button>
+        </div>
+        
+        <div id="loader" class="loader"></div>
+        
+        <div id="jobResults" class="job-results">
+            <!-- Results will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const recommendBtn = document.getElementById('recommendBtn');
+            const userNameInput = document.getElementById('userName');
+            const userSkillsSelect = document.getElementById('userSkills');
+            const jobResults = document.getElementById('jobResults');
+            const errorMessage = document.getElementById('errorMessage');
+            const loader = document.getElementById('loader');
+            
+            // Job database with more information
+            const jobDatabase = {
+                "sewing": {
+                    title: "Textile and Apparel",
+                    description: "Your sewing skills open doors to the fashion and textile industry. From creating custom clothing to industrial production, your craftsmanship is valuable.",
+                    jobs: ["Seamstress/Tailor", "Alterations Specialist", "Fashion Designer Assistant", "Costume Designer"],
+                    resources: [
+                        { name: "Video Tutorials", url: "https://www.youtube.com/results?search_query=sewing+tutorials" },
+                        { name: "Online Courses", url: "https://www.udemy.com/topic/sewing/" }
+                    ]
+                },
+                "iti diploma": {
+                    title: "Technical Trades",
+                    description: "Your ITI diploma qualifies you for skilled technical positions in various industries with good growth potential.",
+                    jobs: ["Industrial Technician", "Workshop Supervisor", "Quality Control Inspector", "Maintenance Specialist"],
+                    resources: [
+                        { name: "Government Programs", url: "https://www.nios.ac.in/vocational/ITI-courses.aspx" },
+                        { name: "Skill Development", url: "https://www.msde.gov.in/" }
+                    ]
+                },
+                "dancing": {
+                    title: "Performance Arts",
+                    description: "Your dancing skills can lead to opportunities in entertainment, education, and fitness sectors.",
+                    jobs: ["Dance Instructor", "Choreographer", "Performer", "Dance Therapist"],
+                    resources: [
+                        { name: "Dance Tutorials", url: "https://www.youtube.com/results?search_query=dance+tutorials" },
+                        { name: "Online Classes", url: "https://www.udemy.com/topic/dance/" }
+                    ]
+                },
+                "singing": {
+                    title: "Vocal Performance",
+                    description: "Your vocal talent can lead to various performance opportunities and teaching positions.",
+                    jobs: ["Vocal Coach", "Session Singer", "Music Instructor", "Performer"],
+                    resources: [
+                        { name: "Singing Lessons", url: "https://www.youtube.com/results?search_query=singing+tutorials" },
+                        { name: "Voice Training", url: "https://www.udemy.com/topic/singing/" }
+                    ]
+                },
+                "pottery": {
+                    title: "Ceramic Arts",
+                    description: "Your pottery skills allow you to create functional and decorative pieces with commercial potential.",
+                    jobs: ["Ceramic Artist", "Pottery Instructor", "Production Potter", "Crafts Entrepreneur"],
+                    resources: [
+                        { name: "Pottery Techniques", url: "https://www.youtube.com/results?search_query=pottery+tutorials" },
+                        { name: "Online Workshops", url: "https://www.udemy.com/topic/pottery/" }
+                    ]
+                },
+                "farming": {
+                    title: "Agricultural Sector",
+                    description: "Your farming knowledge positions you for success in sustainable food production and agriculture.",
+                    jobs: ["Farm Manager", "Agricultural Technician", "Organic Farmer", "Agribusiness Consultant"],
+                    resources: [
+                        { name: "Family Farming", url: "https://www.fao.org/family-farming/en/" },
+                        { name: "Modern Techniques", url: "https://www.youtube.com/results?search_query=modern+farming+techniques" }
+                    ]
+                },
+                "fishing": {
+                    title: "Aquatic Harvesting",
+                    description: "Your fishing expertise can lead to opportunities in commercial fishing, aquaculture, and tourism.",
+                    jobs: ["Commercial Fisherman", "Fish Farm Technician", "Fishing Guide", "Marine Resource Manager"],
+                    resources: [
+                        { name: "Fishing Techniques", url: "https://www.youtube.com/results?search_query=fishing+techniques" },
+                        { name: "Sustainable Practices", url: "https://www.msc.org/for-business/fisheries" }
+                    ]
+                },
+                "carpentry": {
+                    title: "Woodworking Trades",
+                    description: "Your carpentry skills are in demand for construction, furniture making, and custom woodwork.",
+                    jobs: ["Carpenter", "Furniture Maker", "Cabinet Installer", "Construction Supervisor"],
+                    resources: [
+                        { name: "Carpentry Lessons", url: "https://www.youtube.com/results?search_query=carpentry+lessons" },
+                        { name: "Advanced Techniques", url: "https://www.udemy.com/topic/carpentry/" }
+                    ]
+                },
+                "tailoring": {
+                    title: "Custom Clothing",
+                    description: "Your tailoring skills allow you to create and alter garments with precision and style.",
+                    jobs: ["Custom Tailor", "Alterations Specialist", "Pattern Maker", "Clothing Entrepreneur"],
+                    resources: [
+                        { name: "Tailoring Tutorials", url: "https://www.youtube.com/results?search_query=tailoring+tutorials" },
+                        { name: "Advanced Skills", url: "https://www.udemy.com/topic/sewing/" }
+                    ]
+                },
+                "welding": {
+                    title: "Metal Fabrication",
+                    description: "Your welding skills make you valuable in manufacturing, construction, and industrial maintenance.",
+                    jobs: ["Welder", "Fabricator", "Welding Inspector", "Metal Artist"],
+                    resources: [
+                        { name: "Welding Tutorials", url: "https://www.youtube.com/results?search_query=welding+tutorials" },
+                        { name: "Certification Info", url: "https://awo.aws.org/certification/" }
+                    ]
+                },
+                "baking": {
+                    title: "Culinary Arts",
+                    description: "Your baking skills can lead to opportunities in food service, retail, and entrepreneurship.",
+                    jobs: ["Baker", "Pastry Chef", "Bakery Owner", "Food Production Supervisor"],
+                    resources: [
+                        { name: "Baking Tutorials", url: "https://www.youtube.com/results?search_query=baking+tutorials" },
+                        { name: "Advanced Courses", url: "https://www.udemy.com/topic/baking/" }
+                    ]
+                },
+                "handicrafts": {
+                    title: "Artisanal Creation",
+                    description: "Your handicraft skills allow you to create unique items with commercial and artistic value.",
+                    jobs: ["Artisan", "Craft Instructor", "Product Designer", "Craft Entrepreneur"],
+                    resources: [
+                        { name: "Craft Techniques", url: "https://www.youtube.com/results?search_query=handicraft+making" },
+                        { name: "Marketing Your Crafts", url: "https://www.etsy.com/seller-handbook" }
+                    ]
+                },
+                "plumbing": {
+                    title: "Building Services",
+                    description: "Your plumbing skills are essential for construction, renovation, and maintenance projects.",
+                    jobs: ["Plumber", "Pipefitter", "Plumbing Inspector", "Maintenance Technician"],
+                    resources: [
+                        { name: "Plumbing Basics", url: "https://www.youtube.com/results?search_query=plumbing+basics" },
+                        { name: "Advanced Techniques", url: "https://www.udemy.com/topic/plumbing/" }
+                    ]
+                },
+                "electrician": {
+                    title: "Electrical Services",
+                    description: "Your electrical skills make you valuable in construction, manufacturing, and maintenance.",
+                    jobs: ["Electrician", "Electrical Technician", "Maintenance Electrician", "Electrical Inspector"],
+                    resources: [
+                        { name: "Electrician Training", url: "https://www.youtube.com/results?search_query=electrician+training" },
+                        { name: "Certification Paths", url: "https://www.electricaltrainingalliance.org/" }
+                    ]
+                },
+                "beautician": {
+                    title: "Beauty Industry",
+                    description: "Your beauty skills can lead to opportunities in salons, spas, and personal care services.",
+                    jobs: ["Beautician", "Makeup Artist", "Salon Specialist", "Beauty Consultant"],
+                    resources: [
+                        { name: "Beauty Courses", url: "https://www.youtube.com/results?search_query=beautician+courses" },
+                        { name: "Advanced Techniques", url: "https://www.udemy.com/topic/beauty/" }
+                    ]
+                },
+                "mechanic": {
+                    title: "Automotive Services",
+                    description: "Your mechanical skills are in demand for vehicle maintenance, repair, and diagnostics.",
+                    jobs: ["Auto Mechanic", "Diesel Technician", "Equipment Repair Specialist", "Shop Supervisor"],
+                    resources: [
+                        { name: "Mechanic Training", url: "https://www.youtube.com/results?search_query=mechanic+training" },
+                        { name: "Advanced Diagnostics", url: "https://www.udemy.com/topic/auto-mechanic/" }
+                    ]
+                }
+            };
+            
+            // Event listeners
+            recommendBtn.addEventListener('click', getJobRecommendations);
+            userNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    getJobRecommendations();
+                }
+            });
+            
+            // Validation function
+            function validateInputs() {
+                const name = userNameInput.value.trim();
+                const skills = userSkillsSelect.value;
+                
+                if (!name || !skills) {
+                    errorMessage.classList.add('visible');
+                    return false;
+                }
+                
+                errorMessage.classList.remove('visible');
+                return true;
+            }
+            
+            // Create confetti effect
+            function createConfetti() {
+                const confettiCount = 100;
+                const colors = ['#ff0000'];
+                
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    
+                    // Random position
+                    const left = Math.random() * 100;
+                    const top = Math.random() * -10;
+                    
+                    // Random size
+                    const size = Math.random() * 8 + 5;
+                    
+                    // Random color
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Random rotation
+                    const rotation = Math.random() * 360;
+                    
+                    confetti.style.left = left + '%';
+                    confetti.style.top = top + 'px';
+                    confetti.style.width = size + 'px';
+                    confetti.style.height = size + 'px';
+                    confetti.style.backgroundColor = color;
+                    confetti.style.transform = `rotate(${rotation}deg)`;
+                    
+                    document.querySelector('body').appendChild(confetti);
+                    
+                    // Animation
+                    const animation = confetti.animate([
+                        { transform: `translate(0, 0) rotate(${rotation}deg)`, opacity: 1 },
+                        { transform: `translate(${Math.random() * 100 - 50}px, ${window.innerHeight}px) rotate(${rotation + Math.random() * 360}deg)`, opacity: 0 }
+                    ], {
+                        duration: Math.random() * 2000 + 2000,
+                        easing: 'cubic-bezier(0.1, 0.8, 0.9, 1)'
+                    });
+                    
+                    animation.onfinish = () => {
+                        confetti.remove();
+                    };
+                }
+            }
+            
+            // Main recommendation function
+            function getJobRecommendations() {
+                if (!validateInputs()) return;
+                
+                const name = userNameInput.value.trim();
+                const skills = userSkillsSelect.value;
+                const location = document.querySelector('input[name="location"]:checked').value;
+                
+                // Show loading spinner
+                jobResults.classList.remove('visible');
+                loader.style.display = 'block';
+                
+                // Simulate API delay
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    
+                    // Get job info from our database
+                    const jobInfo = jobDatabase[skills];
+                    
+                    if (jobInfo) {
+                        // Location-specific text
+                        let locationText = "";
+                        if (location === "local") {
+                            locationText = "in your local area";
+                        } else if (location === "remote") {
+                            locationText = "that can be done remotely";
+                        } else {
+                            locationText = "anywhere";
+                        }
+                        
+                        // Build HTML content
+                        let resultHTML = `
+                            <h3>Hello, ${name}!</h3>
+                            <p>Based on your ${skills} skill, we've found some recommendations ${locationText}:</p>
+                            <div class="job-card">
+                                <span class="skill-badge">${jobInfo.title}</span>
+                                <h3>Career Opportunities</h3>
+                                <p>${jobInfo.description}</p>
+                                <p><strong>Potential Roles:</strong></p>
+                                <ul>
+                                    ${jobInfo.jobs.map(job => `<li>${job}</li>`).join('')}
+                                </ul>
+                            </div>
+                            
+                            <div class="job-card">
+                                <h3>Learning Resources</h3>
+                                <p>Enhance your skills with these recommended resources:</p>
+                                <div class="job-links">
+                                    ${jobInfo.resources.map(resource => 
+                                      `<a href="${resource.url}" target="_blank" class="job-link">${resource.name}</a>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                        `;
+                        
+                        jobResults.innerHTML = resultHTML;
+                        jobResults.classList.add('visible');
+                        
+                        // Trigger confetti animation
+                        createConfetti();
+                    } else {
+                        jobResults.innerHTML = `<div class="job-card">
+                            <h3>Sorry!</h3>
+                            <p>We couldn't find specific recommendations for "${skills}" at this time. Please try a different skill or check back later.</p>
+                        </div>`;
+                        jobResults.classList.add('visible');
+                    }
+                    
+                    // Scroll to results
+                    setTimeout(() => {
+                        jobResults.scrollIntoView({ behavior: 'smooth' });
+                    }, 300);
+                    
+                }, 1500); // 1.5 second delay for loading effect
+            }
+        });
+    </script>
+</body>
+</html>

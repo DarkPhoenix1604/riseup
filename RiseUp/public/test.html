@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill Quiz App</title>
+  <style>
+    :root {
+      --primary-color: #DA0000;
+      --background-dark: #221111;
+      --background-light: #FFFFFF;
+      --text-dark: #2D2D2D;
+      --text-light: #FFFFFF;
+      --shadow-color: rgba(218, 0, 0, 0.2);
+      --option-bg-hover: #FFE6E6;
+      --correct-color: #4CAF50;
+      --incorrect-color: #DA0000;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    /* Canvas positioning for particles */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    body {
+      color: var(--text-dark);
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      /* Make body transparent to show particles */
+      background-color: transparent;
+    }
+
+    body.dark-mode {
+      color: var(--text-light);
+    }
+
+    /* Add background color to main content for readability */
+    header, main, .content {
+      background-color: var(--background-light);
+      transition: background-color 0.3s;
+    }
+
+    body.dark-mode header,
+    body.dark-mode main,
+    body.dark-mode .content {
+      background-color: var(--background-dark);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 5%;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .theme-toggle {
+      background: #F5F5F5;
+      border-radius: 20px;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .dark-mode .theme-toggle {
+      background: #333;
+    }
+
+    .theme-icon {
+      padding: 5px 10px;
+      border-radius: 15px;
+      margin: 0 2px;
+      font-size: 14px;
+    }
+
+    .theme-icon.active {
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode .theme-icon.active {
+      background-color: #555;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      padding: 40px 5%;
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .sidebar {
+      flex: 0 0 250px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .content {
+      flex: 1;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 70vh;
+    }
+
+    .welcome-screen, .category-screen, .quiz-screen, .results-screen {
+      display: none;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .active-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+    }
+
+    /* Updated animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .welcome-screen {
+      text-align: center;
+    }
+
+    .welcome-screen h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .welcome-screen p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    .btn:hover {
+      background-color: #B00000;
+      transform: translateY(-3px);
+    }
+
+    .category-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+      width: 100%;
+    }
+
+    .category-item {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px var(--shadow-color);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+      border-left: 5px solid var(--primary-color);
+      animation: fadeInUp 0.8s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .category-item:nth-child(1) { animation-delay: 0.1s; }
+    .category-item:nth-child(2) { animation-delay: 0.3s; }
+    .category-item:nth-child(3) { animation-delay: 0.5s; }
+
+    .category-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 14px var(--shadow-color);
+    }
+
+    .dark-mode .category-item {
+      background-color: #2D2D2D;
+    }
+
+    .category-icon {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+    }
+
+    .category-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .category-desc {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .dark-mode .category-desc {
+      color: #BBB;
+    }
+
+    .progress-bar {
+      margin: 20px 0;
+      height: 8px;
+      background-color: #EEE;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .dark-mode .progress-bar {
+      background-color: #444;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--primary-color);
+      width: 0%;
+      transition: width 0.5s;
+    }
+
+    .question-counter {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 10px;
+      align-self: flex-start;
+    }
+
+    .dark-mode .question-counter {
+      color: #BBB;
+    }
+
+    .question-text {
+      font-size: 24px;
+      margin-bottom: 30px;
+      text-align: center;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .options-list {
+      list-style: none;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .option-item {
+      background-color: white;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 8px var(--shadow-color);
+      transition: background-color 0.3s, transform 0.2s;
+      animation: slideIn 0.5s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .option-item:nth-child(1) { animation-delay: 0.1s; }
+    .option-item:nth-child(2) { animation-delay: 0.2s; }
+    .option-item:nth-child(3) { animation-delay: 0.3s; }
+    .option-item:nth-child(4) { animation-delay: 0.4s; }
+
+    .option-item:hover {
+      background-color: var(--option-bg-hover);
+      transform: translateX(5px);
+    }
+
+    .dark-mode .option-item {
+      background-color: #333;
+    }
+
+    .dark-mode .option-item:hover {
+      background-color: #444;
+    }
+
+    .option-marker {
+      background-color: var(--primary-color);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-weight: bold;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .option-item.correct {
+      background-color: rgba(76, 175, 80, 0.2);
+      border: 1px solid var(--correct-color);
+    }
+
+    .option-item.incorrect {
+      background-color: rgba(218, 0, 0, 0.2);
+      border: 1px solid var(--incorrect-color);
+    }
+
+    .option-item.selected {
+      border: 2px solid var(--primary-color);
+    }
+
+    .next-btn {
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .results-title {
+      font-size: 32px;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .results-score {
+      font-size: 24px;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .score-highlight {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .chart-container {
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 40px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .retry-btn {
+      margin-right: 10px;
+    }
+
+    .buttons-container {
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    .feedback-list {
+      margin-top: 30px;
+      width: 100%;
+    }
+
+    .feedback-item {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px var(--shadow-color);
+      animation: fadeInUp 0.5s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .feedback-item:nth-child(1) { animation-delay: 0.2s; }
+    .feedback-item:nth-child(2) { animation-delay: 0.4s; }
+    .feedback-item:nth-child(3) { animation-delay: 0.6s; }
+
+    .dark-mode .feedback-item {
+      background-color: #333;
+    }
+
+    .feedback-question {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .feedback-answer {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    }
+
+    .feedback-label {
+      color: #777;
+    }
+
+    .dark-mode .feedback-label {
+      color: #BBB;
+    }
+
+    .feedback-user {
+      color: var(--incorrect-color);
+    }
+
+    .feedback-correct {
+      color: var(--correct-color);
+    }
+
+    @media (max-width: 768px) {
+      main {
+        flex-direction: column;
+        padding: 20px 5%;
+      }
+
+      .sidebar {
+        flex: none;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .category-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particles.js container -->
+  <div id="particles-js"></div>
+  
+  <header>
+    <div class="logo">
+      <span>Skill Quiz</span>
+    </div>
+    <div class="theme-toggle">
+      <div class="theme-icon light-icon active">☀</div>
+      <div class="theme-icon dark-icon">🌙</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="content">
+      <!-- Welcome Screen -->
+      <div class="welcome-screen active-screen">
+        <h1>Welcome to Skill Quiz</h1>
+        <p>Test your knowledge across different skill categories</p>
+        <button class="btn start-btn">Start Quiz</button>
+      </div>
+
+      <!-- Category Selection Screen -->
+      <div class="category-screen">
+        <h2>Choose a Category</h2>
+        <div class="category-list">
+          <div class="category-item" data-category="Technical">
+            <div class="category-icon">💻</div>
+            <div class="category-name">Technical</div>
+            <div class="category-desc">Programming, algorithms, and technical concepts</div>
+          </div>
+          <div class="category-item" data-category="Soft Skills">
+            <div class="category-icon">🤝</div>
+            <div class="category-name">Soft Skills</div>
+            <div class="category-desc">Communication, teamwork, and interpersonal skills</div>
+          </div>
+          <div class="category-item" data-category="Trading & Finance">
+            <div class="category-icon">📈</div>
+            <div class="category-name">Trading & Finance</div>
+            <div class="category-desc">Markets, investments, and financial concepts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Screen -->
+      <div class="quiz-screen">
+        <div class="question-counter">Question <span id="current-question">1</span> of <span id="total-questions">5</span></div>
+        <div class="progress-bar">
+          <div class="progress"></div>
+        </div>
+        <h2 class="question-text"></h2>
+        <ul class="options-list"></ul>
+        <button class="btn next-btn">Next Question</button>
+      </div>
+
+      <!-- Results Screen -->
+      <div class="results-screen">
+        <h2 class="results-title">Quiz Completed!</h2>
+        <p class="results-score">Your score: <span class="score-highlight">0</span><span class="total-questions"></span></p>
+        
+        <div class="chart-container">
+          <canvas id="resultsChart"></canvas>
+        </div>
+        
+        <div class="buttons-container">
+          <button class="btn retry-btn">Try Again</button>
+          <button class="btn home-btn">Home</button>
+        </div>
+        
+        <div class="feedback-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load particles.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script>
+    // Initialize particles.js
+    document.addEventListener('DOMContentLoaded', function() {
+      particlesJS('particles-js', {
+        "particles": {
+          "number": {
+            "value": 80,
+            "density": {
+              "enable": true,
+              "value_area": 800
+            }
+          },
+          "color": {
+            "value": "#DA0000"
+          },
+          "shape": {
+            "type": "circle",
+            "stroke": {
+              "width": 0,
+              "color": "#000000"
+            },
+            "polygon": {
+              "nb_sides": 5
+            }
+          },
+          "opacity": {
+            "value": 0.5,
+            "random": false,
+            "anim": {
+              "enable": false,
+              "speed": 1,
+              "opacity_min": 0.1,
+              "sync": false
+            }
+          },
+          "size": {
+            "value": 3,
+            "random": true,
+            "anim": {
+              "enable": false,
+              "speed": 40,
+              "size_min": 0.1,
+              "sync": false
+            }
+          },
+          "line_linked": {
+            "enable": true,
+            "distance": 150,
+            "color": "#DA0000",
+            "opacity": 0.4,
+            "width": 1
+          },
+          "move": {
+            "enable": true,
+            "speed": 6,
+            "direction": "none",
+            "random": false,
+            "straight": false,
+            "out_mode": "out",
+            "bounce": false,
+            "attract": {
+              "enable": false,
+              "rotateX": 600,
+              "rotateY": 1200
+            }
+          }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": {
+              "enable": true,
+              "mode": "repulse"
+            },
+            "onclick": {
+              "enable": true,
+              "mode": "push"
+            },
+            "resize": true
+          },
+          "modes": {
+            "grab": {
+              "distance": 400,
+              "line_linked": {
+                "opacity": 1
+              }
+            },
+            "bubble": {
+              "distance": 400,
+              "size": 40,
+              "duration": 2,
+              "opacity": 8,
+              "speed": 3
+            },
+            "repulse": {
+              "distance": 200,
+              "duration": 0.4
+            },
+            "push": {
+              "particles_nb": 4
+            },
+            "remove": {
+              "particles_nb": 2
+            }
+          }
+        },
+        "retina_detect": true
+      });
+
+      // Update particles colors when theme changes
+      function updateParticlesTheme(isDark) {
+        const particleColor = isDark ? "#FFFFFF" : "#DA0000";
+        pJSDom[0].pJS.particles.color.value = particleColor;
+        pJSDom[0].pJS.particles.line_linked.color = particleColor;
+        pJSDom[0].pJS.fn.particlesRefresh();
+      }
+
+      // Listen for theme changes to update particles
+      document.querySelector('.theme-toggle').addEventListener('click', function() {
+        setTimeout(() => {
+          updateParticlesTheme(document.body.classList.contains('dark-mode'));
+        }, 100);
+      });
+    });
+
+    // Quiz data (this would typically come from your backend/API)
+    const quizData = {
+      "Technical": [
+        {
+          "Question": "What is the time complexity of binary search?",
+          "Answer": "O(log n)",
+          "Options": ["O(n)", "O(log n)", "O(n log n)", "O(1)"]
+        },
+        {
+          "Question": "Which data structure uses LIFO principle?",
+          "Answer": "Stack",
+          "Options": ["Queue", "Stack", "Linked List", "Tree"]
+        },
+        {
+          "Question": "What does SQL stand for?",
+          "Answer": "Structured Query Language",
+          "Options": ["Structured Query Language", "Simple Query Language", "Sequential Query Language", "Standard Query Logic"]
+        },
+        {
+          "Question": "Which protocol is used for secure web browsing?",
+          "Answer": "HTTPS",
+          "Options": ["HTTP", "HTTPS", "FTP", "SMTP"]
+        },
+        {
+          "Question": "What is the primary purpose of an API?",
+          "Answer": "To allow different software applications to communicate with each other",
+          "Options": ["To create user interfaces", "To allow different software applications to communicate with each other", "To store data in databases", "To encrypt data"]
+        }
+      ],
+      "Soft Skills": [
+        {
+          "Question": "Which of the following is a key aspect of emotional intelligence?",
+          "Answer": "Self-awareness",
+          "Options": ["Technical knowledge", "Self-awareness", "Physical fitness", "Academic qualifications"]
+        },
+        {
+          "Question": "What is active listening?",
+          "Answer": "Fully concentrating on what is being said rather than passively hearing",
+          "Options": ["Speaking loudly", "Interrupting to show engagement", "Fully concentrating on what is being said rather than passively hearing", "Agreeing with everything"]
+        },
+        {
+          "Question": "Which conflict resolution style seeks to find a solution that partially satisfies all parties?",
+          "Answer": "Compromise",
+          "Options": ["Avoidance", "Competition", "Accommodation", "Compromise"]
+        },
+        {
+          "Question": "What is the primary benefit of diversity in a team?",
+          "Answer": "Different perspectives lead to better problem-solving",
+          "Options": ["Easier management", "Different perspectives lead to better problem-solving", "Reduced conflicts", "Faster decision making"]
+        },
+        {
+          "Question": "What is the first step in effectively managing time?",
+          "Answer": "Setting clear priorities",
+          "Options": ["Working longer hours", "Setting clear priorities", "Multitasking", "Delegating all tasks"]
+        }
+      ],
+      "Trading & Finance": [
+        {
+          "Question": "What is diversification in investing?",
+          "Answer": "Spreading investments across various financial instruments to reduce risk",
+          "Options": ["Buying more of one successful stock", "Spreading investments across various financial instruments to reduce risk", "Investing only in risky assets", "Keeping all money in cash"]
+        },
+        {
+          "Question": "What does ROI stand for?",
+          "Answer": "Return On Investment",
+          "Options": ["Return On Interest", "Rate Of Inflation", "Return On Investment", "Risk Of Investment"]
+        },
+        {
+          "Question": "What is a bear market?",
+          "Answer": "A market condition where prices are falling",
+          "Options": ["A market condition where prices are rising", "A market condition where prices are falling", "A market where only commodities are traded", "A market that operates 24/7"]
+        },
+        {
+          "Question": "What is a stop-loss order?",
+          "Answer": "An order to sell a security when it reaches a specific price to limit loss",
+          "Options": ["An order to buy more when prices fall", "An order to sell a security when it reaches a specific price to limit loss", "A limit on daily trading volumes", "An insurance against market crashes"]
+        },
+        {
+          "Question": "Which financial ratio measures a company's ability to pay short-term obligations?",
+          "Answer": "Liquidity ratio",
+          "Options": ["P/E ratio", "Debt-to-equity ratio", "Liquidity ratio", "Return on assets"]
+        }
+      ]
+    };
+
+    // DOM Elements
+    const welcomeScreen = document.querySelector('.welcome-screen');
+    const categoryScreen = document.querySelector('.category-screen');
+    const quizScreen = document.querySelector('.quiz-screen');
+    const resultsScreen = document.querySelector('.results-screen');
+    const startBtn = document.querySelector('.start-btn');
+    const categoryItems = document.querySelectorAll('.category-item');
+    const questionText = document.querySelector('.question-text');
+    const optionsList = document.querySelector('.options-list');
+    const nextBtn = document.querySelector('.next-btn');
+    const currentQuestionEl = document.getElementById('current-question');
+    const totalQuestionsEl = document.getElementById('total-questions');
+    const progressBar = document.querySelector('.progress');
+    const retryBtn = document.querySelector('.retry-btn');
+    const homeBtn = document.querySelector('.home-btn');
+    const resultScore = document.querySelector('.results-score .score-highlight');
+    const resultTotalQuestions = document.querySelector('.results-score .total-questions');
+    const feedbackList = document.querySelector('.feedback-list');
+    const themeToggle = document.querySelector('.theme-toggle');
+    const lightIcon = document.querySelector('.light-icon');
+    const darkIcon = document.querySelector('.dark-icon');
+
+    // Quiz variables
+    let currentCategory = '';
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+
+    // Event Listeners
+    startBtn.addEventListener('click', () => showScreen(categoryScreen));
+    
+    categoryItems.forEach(item => {
+      item.addEventListener('click', () => {
+        currentCategory = item.getAttribute('data-category');
+        startQuiz(currentCategory);
+      });
+    });
+    
+    nextBtn.addEventListener('click', handleNextQuestion);
+    retryBtn.addEventListener('click', () => showScreen(categoryScreen));
+    homeBtn.addEventListener('click', () => showScreen(welcomeScreen));
+    
+    themeToggle.addEventListener('click', toggleTheme);
+
+    // Functions
+    function showScreen(screen) {
+      document.querySelectorAll('.active-screen').forEach(s => s.classList.remove('active-screen'));
+      screen.classList.add('active-screen');
+    }
+
+    function startQuiz(category) {
+      // Reset quiz state
+      currentQuestionIndex = 0;
+      score = 0;
+      userAnswers = [];
+      
+      // Get questions for selected category
+      questions = quizData[category].sort(() => 0.5 - Math.random()).slice(0, 5);
+      
+      // Update UI
+      totalQuestionsEl.textContent = questions.length;
+      showScreen(quizScreen);
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const question = questions[currentQuestionIndex];
+      
+      // Update question number and progress bar
+      currentQuestionEl.textContent = currentQuestionIndex + 1;
+      progressBar.style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
+
+      
+      // Set question text
+      questionText.textContent = question.Question;
+      
+      // Clear previous options
+      optionsList.innerHTML = '';
+      
+      // Create shuffled options
+      const shuffledOptions = [...question.Options].sort(() => 0.5 - Math.random());
+      
+      // Add options to the UI
+      shuffledOptions.forEach((option, index) => {
+        const li = document.createElement('li');
+        li.className = 'option-item';
+        li.dataset.answer = option;
+        
+        const marker = document.createElement('span');
+        marker.className = 'option-marker';
+        marker.textContent = String.fromCharCode(65 + index); // A, B, C, D...
+        
+        const text = document.createElement('span');
+        text.className = 'option-text';
+        text.textContent = option;
+        
+        li.appendChild(marker);
+        li.appendChild(text);
+        li.addEventListener('click', () => selectOption(li));
+        
+        optionsList.appendChild(li);
+      });
+      
+      // Hide next button until user selects an option
+      nextBtn.style.display = 'none';
+    }
+
+    function selectOption(selectedOption) {
+      // Prevent selecting multiple options
+      if (nextBtn.style.display === 'block') return;
+      
+      const question = questions[currentQuestionIndex];
+      const selectedAnswer = selectedOption.dataset.answer;
+      const isCorrect = selectedAnswer === question.Answer;
+      
+      // Highlight selected option
+      document.querySelectorAll('.option-item').forEach(option => {
+        option.classList.remove('selected');
+        
+        // Show correct/incorrect answers
+        const optionAnswer = option.dataset.answer;
+        if (optionAnswer === question.Answer) {
+          option.classList.add('correct');
+        }
+      });
+      
+      selectedOption.classList.add('selected');
+      if (!isCorrect) {
+        selectedOption.classList.add('incorrect');
+      }
+      
+      // Save user's answer
+      userAnswers.push({
+        question: question.Question,
+        userAnswer: selectedAnswer,
+        correctAnswer: question.Answer,
+        isCorrect: isCorrect
+      });
+      
+      // Update score
+      if (isCorrect) score++;
+      
+      // Show next button
+      nextBtn.style.display = 'block';
+    }
+
+    function handleNextQuestion() {
+      currentQuestionIndex++;
+      
+      if (currentQuestionIndex < questions.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+  showScreen(resultsScreen);
+  
+  // Calculate the percentage score
+  const percentage = Math.round((score / questions.length) * 100);
+  
+  // Update score display with percentage only
+  resultScore.textContent = percentage + '%';
+  
+  // Update the results title element with a dynamic message based on percentage
+  const resultsTitleEl = document.querySelector('.results-title');
+  if (percentage >= 60) {
+    resultsTitleEl.textContent = "Congratulations!! You have successfully completed this quiz.";
+  } else {
+    resultsTitleEl.textContent = "Sorry, You need improvement in this field. You can check out our following courses.";
+  }
+  
+  // Generate chart and show feedback as before
+  createResultsChart();
+  showFeedback();
+}
+
+
+
+
+
+    function createResultsChart() {
+      const ctx = document.getElementById('resultsChart').getContext('2d');
+      
+      // Destroy previous chart if it exists
+      if (window.quizResultChart) {
+        window.quizResultChart.destroy();
+      }
+      
+      window.quizResultChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Correct', 'Incorrect'],
+          datasets: [{
+            data: [score, questions.length - score],
+            backgroundColor: [
+              '#4CAF50',
+              '#DA0000'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          },
+          cutout: '70%'
+        }
+      });
+    }
+
+    function showFeedback() {
+      feedbackList.innerHTML = '';
+      
+      const incorrectAnswers = userAnswers.filter(answer => !answer.isCorrect);
+      
+      if (incorrectAnswers.length === 0) {
+        const perfectScore = document.createElement('p');
+        perfectScore.textContent = 'Perfect score! All answers were correct.';
+        perfectScore.style.textAlign = 'center';
+        perfectScore.style.marginTop = '20px';
+        feedbackList.appendChild(perfectScore);
+        return;
+      }
+      
+      incorrectAnswers.forEach(answer => {
+        const item = document.createElement('div');
+        item.className = 'feedback-item';
+        
+        const question = document.createElement('div');
+        question.className = 'feedback-question';
+        question.textContent = answer.question;
+        
+        const userAnswer = document.createElement('div');
+        userAnswer.className = 'feedback-answer';
+        
+        const userLabel = document.createElement('span');
+        userLabel.className = 'feedback-label';
+        userLabel.textContent = 'Your answer: ';
+        
+        const userValue = document.createElement('span');
+        userValue.className = 'feedback-user';
+        userValue.textContent = answer.userAnswer;
+        
+        userAnswer.appendChild(userLabel);
+        userAnswer.appendChild(userValue);
+        
+        const correctAnswer = document.createElement('div');
+        correctAnswer.className = 'feedback-answer';
+        
+        const correctLabel = document.createElement('span');
+        correctLabel.className = 'feedback-label';
+        correctLabel.textContent = 'Correct answer: ';
+        
+        const correctValue = document.createElement('span');
+        correctValue.className = 'feedback-correct';
+        correctValue.textContent = answer.correctAnswer;
+        
+        correctAnswer.appendChild(correctLabel);
+        correctAnswer.appendChild(correctValue);
+        
+        item.appendChild(question);
+        item.appendChild(userAnswer);
+        item.appendChild(correctAnswer);
+        
+        feedbackList.appendChild(item);
+      });
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      lightIcon.classList.toggle('active');
+      darkIcon.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>

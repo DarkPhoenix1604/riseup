@@ -1,0 +1,328 @@
+.courses-page {
+    text-align: center;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #da0000;
+    font-weight: 700;
+}
+
+p {
+    color: #555;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    width: 80%;
+    max-width: 500px;
+    padding: 0.8rem 1rem;
+    margin: 1.5rem auto;
+    border: 2px solid #da0000;
+    border-radius: 30px;
+    display: block;
+    background: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-bar:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(218, 0, 0, 0.2);
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filters select {
+    padding: 0.8rem 1rem;
+    border: 2px solid #da0000;
+    border-radius: 30px;
+    background: white;
+    cursor: pointer;
+    color: #da0000;
+    font-size: 1rem;
+    min-width: 200px;
+    transition: all 0.3s ease;
+}
+
+.filters select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(218, 0, 0, 0.2);
+}
+
+.course-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.course-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    text-align: left;
+    border-left: 5px solid #da0000;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.course-card h3 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.course-card p {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.5rem 0;
+}
+
+.course-card button {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #da0000;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.course-card button:hover {
+    background: #b80000;
+    transform: translateY(-2px);
+}
+
+.no-results {
+    font-size: 1.2rem;
+    color: #777;
+    margin: 2rem 0;
+    font-style: italic;
+    grid-column: 1 / -1;
+}
+
+/* Networking Section */
+.networking-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    border-top: 5px solid #da0000;
+}
+
+.networking-section h2 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.networking-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: #da0000;
+}
+
+.peer-filters {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem auto;
+    max-width: 800px;
+    flex-wrap: wrap;
+}
+
+.peer-filters .search-bar {
+    flex: 1;
+    min-width: 250px;
+    margin: 0;
+}
+
+.peer-filters select {
+    padding: 0.8rem 1rem;
+    border: 2px solid #da0000;
+    border-radius: 30px;
+    background: white;
+    color: #da0000;
+    font-size: 1rem;
+    min-width: 200px;
+    transition: all 0.3s ease;
+}
+
+.peer-filters select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(218, 0, 0, 0.2);
+}
+
+.student-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.student-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: all 0.3s ease;
+    border-top: 4px solid #da0000;
+}
+
+.student-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.student-card h4 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.student-card p {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.5rem 0;
+}
+
+.student-card a {
+    color: #da0000;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.student-card a:hover {
+    color: #b80000;
+    text-decoration: underline;
+}
+
+/* Audiobook Section */
+.audiobook-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    border-left: 5px solid #da0000;
+}
+
+.audiobook-section h2 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.audiobook-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: #da0000;
+}
+
+.audiobook-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.audiobook-controls select {
+    padding: 0.8rem 1rem;
+    border: 2px solid #da0000;
+    border-radius: 30px;
+    background: white;
+    color: #555;
+    font-size: 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.audiobook-controls select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(218, 0, 0, 0.2);
+}
+
+.audiobook-controls button {
+    padding: 0.8rem 1.5rem;
+    background-color: #da0000;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.audiobook-controls button:hover:not(:disabled) {
+    background: #b80000;
+    transform: translateY(-2px);
+}
+
+.audiobook-controls button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filters, .peer-filters {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .search-bar, .filters select, .peer-filters select {
+        width: 100%;
+    }
+    
+    .course-list, .student-list {
+        grid-template-columns: 1fr;
+    }
+}

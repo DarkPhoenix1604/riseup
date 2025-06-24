@@ -1,0 +1,176 @@
+/* Reset Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Arial", sans-serif;
+  }
+  
+  /* Main Container */
+  .signup-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 20px;
+    background-color: #f8f8f8;
+  }
+  
+  /* Logo Section */
+  .signup-logo img {
+    width: 250px;
+    height: auto;
+  }
+  
+  /* Signup Form */
+  .signup-form {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    width: 100%;
+    margin-left: 50px;
+  }
+  
+  .signup-header {
+    background: #DA0000;
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+    color: white;
+  }
+  
+  .signup-header h2 {
+    font-size: 20px;
+  }
+  
+  .signup-header p {
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  /* Input Groups */
+  .input-group {
+    margin: 15px 0;
+  }
+  
+  .input-group label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #DA0000; /* Red Theme */
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+  }
+  
+  /* Account Type */
+  .account-type {
+    margin: 15px 0;
+  }
+  
+  .account-type label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #DA0000;
+  }
+  
+  .radio-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+  }
+  
+  .radio-group label {
+    font-size: 14px;
+  }
+  
+  /* Terms Checkbox */
+  .terms {
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  .terms a {
+    color: #DA0000;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .terms a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Signup Button */
+  .signup-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #DA0000;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .signup-btn:hover {
+    background-color: #a80000;
+  }
+  
+  /* Login Link */
+  .login-text {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 15px;
+  }
+  
+  .login-text a {
+    color: #DA0000;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .login-text a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .signup-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .signup-logo {
+      margin-bottom: 20px;
+    }
+  
+    .signup-form {
+      margin-left: 0;
+      width: 90%;
+    }
+  
+    .signup-logo img {
+      width: 180px;
+    }
+  }
+  .social-icons button {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .social-icons button:hover {
+    background: #f2f2f2;
+  }

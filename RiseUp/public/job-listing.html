@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Recommendations - RiseUp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 500px;
+            max-width: 90%;
+            margin: 30px;
+            /* Add some opacity to make text more readable over the background */
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #DA0000;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            color: #6d6875;
+            margin-bottom: 25px;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1d3557;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #1d3557;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #a8dadc;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .input-field:focus {
+            border-color: #457b9d;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background-color: #DA0000;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #b50000;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .results-container {
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        .results-title {
+            color: #1d3557;
+            border-bottom: 2px solid #a8dadc;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .job-card {
+            background: #ffffff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            border-left: 5px solid #DA0000;
+            transition: transform 0.2s;
+            color: #1d3557;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .job-card:hover {
+            transform: translateX(5px);
+            background-color: #a8dadc;
+        }
+
+        .no-jobs {
+            color: #6d6875;
+            font-style: italic;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background-color: #457b9d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .matched-skill {
+            display: inline-block;
+            background-color: #2a9d8f;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .skill-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">RiseUp</div>
+        <div class="tagline">Elevate your career with personalized job matches</div>
+        
+        <h1 class="title">Find Your Best Job Match</h1>
+        
+        <div class="input-group">
+            <label for="name" class="input-label">Your Name</label>
+            <input type="text" id="name" placeholder="e.g., John Smith" class="input-field">
+        </div>
+        
+        <div class="input-group">
+            <label for="skills" class="input-label">Your Skills</label>
+            <input type="text" id="skills" placeholder="e.g., js, crypto, management" class="input-field">
+        </div>
+        
+        <button onclick="getJobRecommendations()" class="btn">DISCOVER OPPORTUNITIES</button>
+        
+        <div id="results" class="results-container"></div>
+    </div>
+
+<script>
+  function getJobRecommendations() {
+    const name = document.getElementById("name").value.trim();
+    const skills = document.getElementById("skills").value.trim().toLowerCase();
+    const resultsDiv = document.getElementById("results");
+
+    if (!name || !skills) {
+        resultsDiv.innerHTML = "<p style='color: #DA0000; font-weight: 600;'>Please enter your name and skills to continue.</p>";
+        return;
+    }
+
+    // Parse skills into an array by splitting on commas
+    const inputSkillsArray = skills.split(',').map(skill => skill.trim());
+    
+    // Skill normalization mapping
+    const skillAliases = {
+        // JavaScript variations
+        "js": "javascript",
+        "javascript": "javascript",
+        "ecmascript": "javascript",
+        
+        // Python variations
+        "py": "python",
+        "python": "python",
+        "python3": "python",
+        
+        // React variations
+        "react": "react",
+        "react.js": "react",
+        "reactjs": "react",
+        
+        // Node.js variations
+        "node": "node.js",
+        "node.js": "node.js",
+        "nodejs": "node.js",
+        
+        // HTML/CSS variations
+        "html": "html",
+        "html5": "html",
+        "css": "css",
+        "css3": "css",
+        
+        // Data Science/ML variations
+        "ml": "machine learning",
+        "machine learning": "machine learning",
+        "ai": "machine learning",
+        "artificial intelligence": "machine learning",
+        "tensorflow": "machine learning",
+        "pytorch": "machine learning",
+        
+        // Database variations
+        "sql": "sql",
+        "mysql": "sql",
+        "postgresql": "sql",
+        "postgres": "sql",
+        "nosql": "nosql",
+        "mongodb": "nosql",
+        
+        // Web Framework variations
+        "django": "python",
+        "flask": "python",
+        "express": "node.js",
+        
+        // Marketing variations
+        "social": "social media",
+        "social media": "social media",
+        "sem": "advertising",
+        "ppc": "advertising",
+        "seo": "seo",
+        
+        // Finance & Trading variations
+        "crypto": "cryptocurrency",
+        "blockchain": "cryptocurrency",
+        "bitcoin": "cryptocurrency",
+        "ethereum": "cryptocurrency",
+        "defi": "cryptocurrency",
+        "nft": "cryptocurrency",
+        "stocks": "trading",
+        "stock trading": "trading",
+        "forex": "trading",
+        "fx": "trading",
+        "trading": "trading",
+        "day trading": "trading",
+        "swing trading": "trading",
+        "technical analysis": "trading",
+        "financial": "finance",
+        "finance": "finance",
+        
+        // Banking variations
+        "bank": "banking",
+        "banking": "banking",
+        "retail banking": "banking",
+        "investment banking": "investment banking",
+        "commercial banking": "banking",
+        "private banking": "banking",
+        "wealth management": "banking",
+        "loan": "banking",
+        "credit": "banking",
+        "mortgage": "banking",
+        
+        // Management variations
+        "management": "management",
+        "project management": "management",
+        "product management": "management",
+        "manager": "management",
+        "team lead": "management",
+        "leadership": "management",
+        "agile": "management",
+        "scrum": "management",
+        "pmp": "management",
+        "mba": "management",
+        
+        // Quantitative Finance variations
+        "quant": "quantitative finance",
+        "quantitative": "quantitative finance",
+        "quantitative trading": "quantitative finance",
+        "algorithmic trading": "quantitative finance",
+        "algo trading": "quantitative finance",
+        "statistical arbitrage": "quantitative finance",
+        "hft": "quantitative finance",
+        "high frequency trading": "quantitative finance",
+        "mathematical finance": "quantitative finance",
+        "financial engineering": "quantitative finance",
+        "derivatives": "quantitative finance",
+        "options pricing": "quantitative finance",
+        "black scholes": "quantitative finance",
+        "risk modeling": "quantitative finance",
+        "financial modeling": "quantitative finance"
+    };
+    
+    // Normalize the input skills using the alias mapping
+    const normalizedSkills = [];
+    const skillNormalizationMap = {}; // For tracking what each input was normalized to
+    
+    inputSkillsArray.forEach(inputSkill => {
+        if (inputSkill in skillAliases) {
+            const normalizedSkill = skillAliases[inputSkill];
+            normalizedSkills.push(normalizedSkill);
+            
+            // Track normalization for display purposes
+            if (!skillNormalizationMap[normalizedSkill]) {
+                skillNormalizationMap[normalizedSkill] = [];
+            }
+            if (!skillNormalizationMap[normalizedSkill].includes(inputSkill)) {
+                skillNormalizationMap[normalizedSkill].push(inputSkill);
+            }
+        } else {
+            // Keep original if no mapping exists
+            normalizedSkills.push(inputSkill);
+            
+            // Track it as self-mapped
+            if (!skillNormalizationMap[inputSkill]) {
+                skillNormalizationMap[inputSkill] = [inputSkill];
+            }
+        }
+    });
+    
+    // Remove duplicates from normalized skills
+    const uniqueNormalizedSkills = [...new Set(normalizedSkills)];
+
+    resultsDiv.innerHTML = `<h2 class="results-title">Hello ${name}, here are your job recommendations:</h2>`;
+    
+    // Display how skills were normalized if any normalizations occurred
+    const hasNormalizedSkills = Object.keys(skillNormalizationMap).some(
+        key => skillNormalizationMap[key].length > 1 || 
+               skillNormalizationMap[key][0] !== key
+    );
+    
+    if (hasNormalizedSkills) {
+        resultsDiv.innerHTML += `<div style="margin-bottom: 20px;">
+            <p><strong>We've recognized these skills:</strong></p>
+            ${Object.entries(skillNormalizationMap)
+                .filter(([normalized, inputs]) => inputs.length > 0)
+                .map(([normalized, inputs]) => 
+                    `<div class="skill-group">
+                        <span class="matched-skill">${normalized}</span> 
+                        ${inputs.length > 1 || inputs[0] !== normalized ? 
+                            `<span style="font-size: 12px; color: #6d6875;">(from: ${inputs.join(', ')})</span>` : 
+                            ''}
+                    </div>`
+                ).join('')}
+        </div>`;
+    }
+
+    // Job categories with specific job roles
+    const jobCategories = {
+        "Marketing": {
+            skills: ["seo", "social media", "advertising", "branding", "content marketing"],
+            jobs: [
+                "Digital Marketing Specialist", "SEO Analyst", "Social Media Manager",
+                "Brand Strategist", "Content Marketing Manager"
+            ]
+        },
+        "Trading & Finance": {
+            skills: ["trading", "finance", "investment", "cryptocurrency"],
+            jobs: [
+                "Stock Trader", "Financial Analyst", "Cryptocurrency Analyst",
+                "Investment Banker", "Risk Manager", "Forex Trader"
+            ]
+        },
+        "Banking": {
+            skills: ["banking", "finance", "investment banking"],
+            jobs: [
+                "Bank Teller", "Loan Officer", "Branch Manager",
+                "Credit Analyst", "Mortgage Specialist", "Financial Advisor"
+            ]
+        },
+        "Management": {
+            skills: ["management", "leadership"],
+            jobs: [
+                "Project Manager", "Product Manager", "Team Lead",
+                "Operations Manager", "Business Analyst", "Program Manager"
+            ]
+        },
+        "Quantitative Finance": {
+            skills: ["quantitative finance", "trading", "finance", "machine learning"],
+            jobs: [
+                "Quantitative Analyst", "Algorithmic Trader", "Risk Modeler",
+                "Derivatives Trader", "Financial Engineer", "Quantitative Developer"
+            ]
+        },
+        "Web Development": {
+            skills: ["html", "css", "javascript", "react", "node.js", "frontend", "backend"],
+            jobs: [
+                "Frontend Developer", "Backend Developer", "Full-Stack Developer",
+                "UI/UX Designer", "Web Performance Engineer"
+            ]
+        },
+        "AI/ML": {
+            skills: ["python", "machine learning", "deep learning", "tensorflow", "neural networks"],
+            jobs: [
+                "Machine Learning Engineer", "Deep Learning Researcher", "AI Developer",
+                "Data Scientist", "Computer Vision Engineer"
+            ]
+        },
+        "Zoology": {
+            skills: ["wildlife", "animals", "biology", "conservation", "genetics"],
+            jobs: [
+                "Wildlife Biologist", "Marine Biologist", "Animal Behaviorist",
+                "Zoo Curator", "Research Zoologist"
+            ]
+        },
+        "Medicine": {
+            skills: ["doctor", "surgery", "nursing", "pharmacy", "healthcare"],
+            jobs: [
+                "Doctor (General Physician)", "Surgeon", "Nurse Practitioner",
+                "Medical Research Scientist", "Pharmacist"
+            ]
+        },
+        "Civil Engineering": { 
+            skills: ["construction", "architecture", "surveying", "structural design"],
+            jobs: [
+                "Structural Engineer", "Construction Manager", "Architectural Designer",
+                "Urban Planner", "Roadway Engineer"
+            ]
+        },
+        "Data Science": {
+            skills: ["data analysis", "statistics", "big data", "sql", "power bi", "machine learning", "nosql"],
+            jobs: [
+                "Data Analyst", "Business Intelligence Developer", "Data Engineer",
+                "Database Administrator", "Machine Learning Engineer"
+            ]
+        }
+    };
+
+    let matchedJobs = [];
+    let matchedCategories = new Set();
+    let matchedSkills = new Set();
+
+    // Match normalized user skills with job categories
+    Object.entries(jobCategories).forEach(([category, data]) => {
+        uniqueNormalizedSkills.forEach(skill => {
+            if (data.skills.includes(skill)) {
+                matchedJobs.push(...data.jobs.map(job => ({job, category})));
+                matchedCategories.add(category);
+                matchedSkills.add(skill);
+            }
+        });
+    });
+
+    // Remove duplicate jobs
+    matchedJobs = matchedJobs.filter((job, index, self) => 
+        index === self.findIndex((j) => j.job === job.job && j.category === job.category)
+    );
+
+    if (matchedJobs.length > 0) {
+        // Display matched categories first
+        resultsDiv.innerHTML += `<p>Based on your skills, we've found matches in: ${Array.from(matchedCategories)
+            .map(cat => `<span class="category-badge">${cat}</span>`)
+            .join(' ')}</p>`;
+        
+        // Display matched jobs
+        matchedJobs.forEach(({job, category}) => {
+            resultsDiv.innerHTML += `<div class="job-card">${job} <span class="category-badge">${category}</span></div>`;
+        });
+        
+        // Add a call to action
+        resultsDiv.innerHTML += `<p style="margin-top: 20px; text-align: center; font-weight: 600;">Found ${matchedJobs.length} opportunities that match your skills!</p>`;
+    } else {
+        resultsDiv.innerHTML += `<p class="no-jobs">We couldn't find exact matches for "${skills}". Try adding more skills or check your spelling.</p>`;
+    }
+  }
+</script>    
+</body>
+</html>
