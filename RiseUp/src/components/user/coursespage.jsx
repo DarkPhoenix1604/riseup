@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./CoursesPage.css";
+import "./coursespage.css";
 
 const coursesData = [
   { id: 1, title: "Web Development", category: "Technology", difficulty: "Beginner" },
